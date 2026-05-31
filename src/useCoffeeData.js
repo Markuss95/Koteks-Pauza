@@ -10,20 +10,16 @@ export function useCoffeeData() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Always-current snapshot so optimistic actions can revert on failure.
-  const stateRef = useRef(state)
-  useEffect(() => {
-    stateRef.current = state
-  }, [state])
-
-  // Mutations in flight. While > 0, background polls must NOT overwrite local
-  // state — otherwise a poll landing mid-request shows stale data and the
-  // optimistic change appears to flicker back and forth.
+  // Number of mutations currently in flight. We only refetch the authoritative
+  // server state once the LAST one settles — refetching after each would let an
+  // earlier finisher clobber a later, still-pending change (the flicker bug when
+  // toggling two people quickly). Polls are likewise skipped while > 0.
   const pending = useRef(0)
 
   const refresh = useCallback(async () => {
     try {
       const data = await api.state()
+      // Don't overwrite local state if a mutation started while we were fetching.
       if (pending.current === 0) {
         setState(data)
         setError(null)
@@ -48,53 +44,34 @@ export function useCoffeeData() {
     return () => clearInterval(t)
   }, [refresh])
 
-  // Fetch and apply the authoritative server state after a mutation. Applied
-  // unconditionally (this is the result of our own write), unlike a poll.
-  const commit = useCallback(async () => {
-    const data = await api.state()
-    setState(data)
-    setError(null)
-  }, [])
-
-  // Wrap a mutating call: run it, apply server state, bubble up any error.
+  // Run a mutation. When the last in-flight mutation finishes, reconcile with
+  // the server. Overlapping clicks therefore don't fight each other.
   const run = useCallback(
     async (fn) => {
       pending.current++
       try {
         await fn()
-        await commit()
         return true
       } catch (e) {
         setError(e.message)
         return false
       } finally {
         pending.current--
-        setLoading(false)
+        if (pending.current === 0) refresh()
       }
     },
-    [commit],
+    [refresh],
   )
 
-  // Apply `apply(state)` immediately, fire the request, then reconcile. On
-  // failure, roll back to the snapshot taken before the change.
+  // Optimistic mutation: apply locally right away — using the functional form so
+  // it builds on the latest state (and on any other in-flight optimistic change)
+  // — then run. The final refresh (when all settle) reconciles with the server.
   const optimistic = useCallback(
-    async (apply, fn) => {
-      const prev = stateRef.current
-      pending.current++
-      setState(apply(prev))
-      try {
-        await fn()
-        await commit()
-        return true
-      } catch (e) {
-        setState(prev)
-        setError(e.message)
-        return false
-      } finally {
-        pending.current--
-      }
+    (apply, fn) => {
+      setState((s) => apply(s))
+      return run(fn)
     },
-    [commit],
+    [run],
   )
 
   const actions = {

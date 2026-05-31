@@ -1,0 +1,22 @@
+# Render Blueprint for the backend (Express + Turso/libSQL).
+# In the Render dashboard: New + → "Blueprint" → pick this repo, then fill in the
+# Turso values when prompted.
+#
+# Data lives in Turso (not on disk), so the Free plan is fine — it survives
+# spin-downs and redeploys. Free instances do sleep after ~15 min idle, so the
+# first request after a quiet period takes ~50s to wake.
+services:
+  - type: web
+    name: koteks-pauza-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TURSO_DATABASE_URL
+        sync: false # set in dashboard, e.g. libsql://your-db.turso.io
+      - key: TURSO_AUTH_TOKEN
+        sync: false # set in dashboard

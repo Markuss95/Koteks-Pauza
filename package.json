@@ -6,14 +6,14 @@
   "description": "Decides whose turn it is to pay for the daily coffee.",
   "scripts": {
     "dev": "concurrently -k -n server,client -c blue,magenta \"npm:server\" \"npm:client\"",
-    "server": "node server/index.js",
+    "server": "cross-env API_PORT=3001 node server/index.js",
     "client": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.3",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.8.0",
     "cors": "^2.8.5",
     "date-fns": "^4.4.0",
     "express": "^4.21.2",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "vite": "^5.4.11"
   }
 }

@@ -75,9 +75,9 @@ function Main() {
 
       <TodayCard data={data} dateKey={today} />
       <Scoreboard users={data.state.users} />
-      {isAdmin && <MembersCard data={data} currentUserId={user.id} />}
       <HistoryCard data={data} />
       <ActivityCard data={data} />
+      {isAdmin && <MembersCard data={data} currentUserId={user.id} />}
 
       <footer className="footer">
         {isAdmin ? (

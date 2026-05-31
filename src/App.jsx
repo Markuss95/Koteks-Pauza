@@ -219,7 +219,6 @@ function TodayCard({ data, dateKey }) {
                   title={inToday ? 'Kliknite da označite da ne dolazi' : 'Kliknite da označite da dolazi'}
                 >
                   <span className="chip__name">{u.displayName}</span>
-                  <span className="chip__score">{u.score}</span>
                   <span className="chip__mark">{inToday ? '✓' : '—'}</span>
                 </button>
               </li>

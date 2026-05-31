@@ -435,29 +435,16 @@ const ACTIVITY_PAGE = 8
 
 function ActivityCard({ data }) {
   const events = data.state.events || []
-  const [actor, setActor] = useState('all')
-  const [date, setDate] = useState(null)
+  // Default to today's activity; clearing the picker shows everything.
+  const [date, setDate] = useState(() => new Date())
   const [visible, setVisible] = useState(ACTIVITY_PAGE)
 
-  // People who appear as actors in the log, for the filter dropdown.
-  const actors = useMemo(
-    () => [...new Set(events.map((e) => e.actor).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
-    [events],
-  )
   // Compare an event's local calendar day to the selected Date.
   const dayKey = (d) => d.toLocaleDateString('en-CA')
-  const filtered = events.filter(
-    (e) =>
-      (actor === 'all' || e.actor === actor) &&
-      (!date || dayKey(new Date(e.ts)) === dayKey(date)),
-  )
+  const filtered = events.filter((e) => !date || dayKey(new Date(e.ts)) === dayKey(date))
   const shown = filtered.slice(0, visible)
 
-  // Reset paging whenever a filter changes.
-  const onActor = (value) => {
-    setActor(value)
-    setVisible(ACTIVITY_PAGE)
-  }
+  // Reset paging whenever the date changes.
   const onDate = (value) => {
     setDate(value)
     setVisible(ACTIVITY_PAGE)
@@ -468,16 +455,6 @@ function ActivityCard({ data }) {
       <div className="card__head">
         <h2>Aktivnost</h2>
         <div className="activity__controls">
-          {actors.length > 0 && (
-            <select className="input input--sm" value={actor} onChange={(e) => onActor(e.target.value)}>
-              <option value="all">Svi</option>
-              {actors.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
-          )}
           <DatePicker
             selected={date}
             onChange={onDate}
@@ -495,7 +472,7 @@ function ActivityCard({ data }) {
         <p className="muted">
           {events.length === 0
             ? 'Još nema zabilježene aktivnosti.'
-            : 'Nema aktivnosti za odabrane filtere.'}
+            : 'Nema aktivnosti za odabrani datum.'}
         </p>
       )}
 

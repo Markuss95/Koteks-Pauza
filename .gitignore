@@ -1,0 +1,7 @@
+node_modules/
+dist/
+
+# SQLite database (regenerated/seeded on first run)
+server/data.sqlite
+server/data.sqlite-shm
+server/data.sqlite-wal

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la)",
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(foreach \\($port in 5173,3001\\) { try { Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction Stop | Select-Object -Expand OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force; \"killed PID $_ on $port\" } } catch { \"nothing on $port\" } })",
+      "Bash(node --input-type=module -e ' *)"
+    ]
+  }
+}

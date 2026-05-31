@@ -1,0 +1,618 @@
+:root {
+  --bg: #1a1410;
+  --bg2: #211a14;
+  --card: #2a211a;
+  --card2: #332820;
+  --line: #443629;
+  --text: #f3e9df;
+  --muted: #b09a86;
+  --accent: #d99a4e;
+  --accent-strong: #f0a94f;
+  --green: #7bbf6a;
+  --danger: #d9694e;
+  --radius: 16px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #3a2a1c 0%, transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+.hero {
+  text-align: center;
+  padding: 16px 0 4px;
+}
+.hero h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  letter-spacing: -0.5px;
+}
+.tagline {
+  margin: 6px 0 18px;
+  color: var(--muted);
+}
+
+.status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.status__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.status--live .status__dot {
+  background: var(--green);
+  box-shadow: 0 0 0 0 rgba(123, 191, 106, 0.6);
+  animation: pulse 1.8s infinite;
+}
+.status__time {
+  color: var(--muted);
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(123, 191, 106, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(123, 191, 106, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(123, 191, 106, 0);
+  }
+}
+
+/* ---- Cards --------------------------------------------------------------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.card__head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ---- Verdict ------------------------------------------------------------- */
+.verdict {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--card2), #3d2e1f);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+.verdict--done {
+  background: linear-gradient(135deg, #25301f, #2c3a22);
+  border-color: #3d5132;
+}
+.verdict__label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.verdict__name {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.btn {
+  background: var(--accent);
+  color: #2a1c0c;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.05s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--accent-strong);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.btn--ghost:hover {
+  background: var(--card2);
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 6px;
+}
+.link-btn:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.link-btn--danger:hover {
+  color: var(--danger);
+}
+
+/* ---- "Someone else paid" picker ------------------------------------------ */
+.payer-picker {
+  margin: 12px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card2);
+}
+.payer-picker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+/* ---- Participants chips -------------------------------------------------- */
+.participants__head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+.chip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: 1px solid var(--line);
+  background: var(--card2);
+  color: var(--text);
+  transition: all 0.12s ease;
+}
+.chip--in {
+  border-color: #4d6b3f;
+  background: #2b3a23;
+}
+.chip--out {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+.chip--payer {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 2px rgba(240, 169, 79, 0.35);
+}
+.chip:disabled {
+  cursor: default;
+}
+.chip__score {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.chip__mark {
+  font-weight: 700;
+}
+
+/* ---- Scoreboard ---------------------------------------------------------- */
+.board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.board__row {
+  display: grid;
+  grid-template-columns: 24px 1fr 2fr 32px;
+  align-items: center;
+  gap: 10px;
+}
+.board__rank {
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.board__name {
+  font-weight: 600;
+}
+.board__bar {
+  height: 10px;
+  background: var(--card2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.board__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.3s ease;
+}
+.board__score {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ---- People / forms ------------------------------------------------------ */
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex: 1;
+}
+.input {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.people__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.people__row:first-child {
+  border-top: none;
+}
+.people__name {
+  font-weight: 600;
+  flex: 1;
+}
+.people__score {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ---- History ------------------------------------------------------------- */
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.history__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.history__row:first-child {
+  border-top: none;
+}
+.history__date {
+  color: var(--muted);
+}
+
+/* ---- Activity log -------------------------------------------------------- */
+.activity__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.input--sm {
+  padding: 5px 8px;
+  font-size: 0.82rem;
+  border-radius: 8px;
+}
+
+/* react-datepicker — dark theme + sizing */
+.react-datepicker-wrapper {
+  width: auto;
+}
+.react-datepicker__input-container input {
+  width: 116px;
+}
+.react-datepicker {
+  background: var(--card2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: inherit;
+}
+.react-datepicker__header {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker-time__header {
+  color: var(--text);
+}
+.react-datepicker__day:hover {
+  background: var(--line);
+}
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: var(--accent);
+  color: #2a1c0c;
+}
+.react-datepicker__day--outside-month {
+  color: var(--muted);
+}
+.react-datepicker__triangle {
+  display: none;
+}
+.react-datepicker__navigation-icon::before {
+  border-color: var(--muted);
+}
+.react-datepicker__close-icon::after {
+  background: var(--accent);
+  color: #2a1c0c;
+}
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.activity__row {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.activity__row:first-child {
+  border-top: none;
+}
+.activity__icon {
+  flex: none;
+  width: 24px;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.activity__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.activity__msg {
+  font-size: 0.92rem;
+}
+.activity__meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ---- Footer -------------------------------------------------------------- */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+}
+
+/* ---- Auth / login -------------------------------------------------------- */
+.loading-screen {
+  text-align: center;
+  color: var(--muted);
+  padding-top: 80px;
+}
+.app--login {
+  max-width: 420px;
+}
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.field span {
+  color: var(--muted);
+}
+.btn--block {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+}
+.login__hint {
+  text-align: center;
+  margin: 4px 0 0;
+}
+.login__hint code {
+  background: var(--bg2);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+.error {
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin: 0;
+}
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+.remember input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ---- User bar / roles ---------------------------------------------------- */
+.userbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.userbar__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.role {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #2a1c0c;
+}
+.role--admin {
+  background: var(--accent-strong);
+}
+.role--regular {
+  background: #6b7a8d;
+  color: #0e1116;
+}
+.role-toggle {
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #2a1c0c;
+}
+.role-toggle.role--regular {
+  color: #0e1116;
+}
+
+/* ---- Banner -------------------------------------------------------------- */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+.banner--error {
+  background: #3a201a;
+  border: 1px solid #6e3a2c;
+  color: #f0c0b2;
+}
+
+/* ---- Add-user form ------------------------------------------------------- */
+.add-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr auto auto;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.add-form .input,
+.add-form .btn {
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .add-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .verdict {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .board__row {
+    grid-template-columns: 20px 1fr 1.4fr 28px;
+  }
+  .people__row {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,36 @@
+name: Keep backend warm
+
+# Render Free spins the API down after ~15 min idle, so the first request after a
+# quiet spell takes ~50s to wake it. This pings the health endpoint on a schedule
+# during working hours so the server stays warm while people actually use the app.
+#
+# Note: keeping the instance awake costs Render instance-hours (Free = 750/month).
+# Pinging only on weekday daytime hours keeps us well under that — the ping rate
+# itself doesn't matter, only how many hours per day the server is kept awake.
+
+on:
+  # GitHub cron is in UTC. Croatia is UTC+1 (winter) / UTC+2 (summer), so to keep
+  # the app warm during ~07:00–15:30 local year-round we ping the union of both
+  # seasons' UTC windows: 05:00–14:30 UTC, Mon–Fri. (Winter 07:00 local = 06:00
+  # UTC and summer 15:30 local = 13:30 UTC, so the union has up to ~1h spillover on
+  # one edge each season — harmless and still well under the instance-hour budget.)
+  # Every 5 min gives margin against GitHub's best-effort scheduler drifting close
+  # to Render's 15-min sleep threshold.
+  schedule:
+    - cron: '*/5 5-13 * * 1-5'          # 05:00–13:55 UTC
+    - cron: '0,5,10,15,20,25,30 14 * * 1-5'  # 14:00–14:30 UTC (the 15:30 local tail)
+  # Lets you trigger a wake-up by hand from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        # --max-time 90 tolerates a cold start on the day's first ping (the ping
+        # that actually does the waking). Retry a couple of times for transient
+        # hiccups; don't fail the workflow if a single ping doesn't land.
+        run: |
+          curl -fsS --max-time 90 --retry 3 --retry-delay 10 \
+            https://koteks-pauza-api.onrender.com/api/health \
+            || echo "Ping failed this run — will try again on the next schedule."

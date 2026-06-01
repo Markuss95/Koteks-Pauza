@@ -192,10 +192,19 @@ app.patch(
     if (target.role === 'admin' && req.body?.role === 'regular' && (await countAdmins()) <= 1) {
       return res.status(400).json({ error: 'Mora postojati barem jedan administrator.' })
     }
+    // An explicit score override (admin manually corrects the ledger).
+    let score
+    if (req.body?.score !== undefined && req.body?.score !== null && req.body?.score !== '') {
+      score = Number(req.body.score)
+      if (!Number.isInteger(score)) {
+        return res.status(400).json({ error: 'Bodovi moraju biti cijeli broj.' })
+      }
+    }
     const updated = await updateUser(req.params.id, {
       displayName: req.body?.displayName,
       role: req.body?.role,
       password: req.body?.password || undefined,
+      score,
     })
     const changes = []
     if (req.body?.displayName && req.body.displayName !== target.display_name) {
@@ -210,6 +219,16 @@ app.patch(
         type: 'user-update',
         actorName: req.user.display_name,
         message: `${target.display_name}: ${changes.join(', ')}`,
+      })
+    }
+    // Score edits get their own audit entry so a manual correction is always
+    // visible in the activity log (and never hidden inside an unrelated rename).
+    if (score !== undefined && score !== Number(target.score)) {
+      await logEvent({
+        type: 'score-edit',
+        actorName: req.user.display_name,
+        message: `${target.display_name}: bodovi ${Number(target.score)} → ${score}`,
+        details: { userId: target.id, from: Number(target.score), to: score },
       })
     }
     res.json({ user: updated })

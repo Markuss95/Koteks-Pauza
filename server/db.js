@@ -98,15 +98,16 @@ export async function createUser({ username, password, displayName, role }) {
   return toPublicUser(await getUserById(id))
 }
 
-export async function updateUser(id, { displayName, role, password }) {
+export async function updateUser(id, { displayName, role, password, score }) {
   const existing = await getUserById(id)
   if (!existing) return null
   await client.execute({
-    sql: 'UPDATE users SET display_name = ?, role = ?, password_hash = ? WHERE id = ?',
+    sql: 'UPDATE users SET display_name = ?, role = ?, password_hash = ?, score = ? WHERE id = ?',
     args: [
       displayName ?? existing.display_name,
       role ? (role === 'admin' ? 'admin' : 'regular') : existing.role,
       password ? hashPassword(password) : existing.password_hash,
+      score ?? existing.score,
       id,
     ],
   })

@@ -27,6 +27,7 @@ const ACTIVITY_ICONS = {
   'user-create': '➕',
   'user-update': '✏️',
   'user-delete': '🗑️',
+  'score-edit': '🔢',
   reset: '♻️',
 }
 
@@ -273,6 +274,8 @@ function MembersCard({ data, currentUserId }) {
   const [form, setForm] = useState({ displayName: '', username: '', password: '', role: 'regular' })
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
+  const [editingScoreId, setEditingScoreId] = useState(null)
+  const [scoreVal, setScoreVal] = useState('')
 
   const add = async (e) => {
     e.preventDefault()
@@ -289,6 +292,22 @@ function MembersCard({ data, currentUserId }) {
     e.preventDefault()
     const ok = await data.updateUser(editingId, { displayName: editName })
     if (ok) setEditingId(null)
+  }
+
+  const startEditScore = (u) => {
+    setEditingScoreId(u.id)
+    setScoreVal(String(u.score))
+  }
+
+  const commitScore = async (e) => {
+    e.preventDefault()
+    const n = parseInt(scoreVal, 10)
+    if (Number.isNaN(n)) {
+      setEditingScoreId(null)
+      return
+    }
+    const ok = await data.updateUser(editingScoreId, { score: n })
+    if (ok) setEditingScoreId(null)
   }
 
   return (
@@ -361,7 +380,29 @@ function MembersCard({ data, currentUserId }) {
                 >
                   {u.role === 'admin' ? 'administrator' : 'korisnik'}
                 </button>
-                <span className="people__score">bodovi {u.score}</span>
+                {editingScoreId === u.id ? (
+                  <form className="add-row score-edit" onSubmit={commitScore}>
+                    <input
+                      className="input input--sm"
+                      type="number"
+                      autoFocus
+                      value={scoreVal}
+                      onChange={(e) => setScoreVal(e.target.value)}
+                      onBlur={commitScore}
+                    />
+                    <button className="btn btn--ghost" type="submit">
+                      Spremi
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    className="link-btn people__score"
+                    onClick={() => startEditScore(u)}
+                    title="Klik za uređivanje bodova"
+                  >
+                    bodovi {u.score}
+                  </button>
+                )}
                 <button className="link-btn" onClick={() => startEdit(u)}>
                   Preimenuj
                 </button>

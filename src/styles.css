@@ -339,6 +339,15 @@ body {
   color: var(--muted);
   font-size: 0.85rem;
 }
+.score-edit {
+  flex: 0 1 auto;
+  margin-bottom: 0;
+  align-items: center;
+}
+.score-edit .input {
+  width: 70px;
+  flex: 0 0 auto;
+}
 
 /* ---- History ------------------------------------------------------------- */
 .history {

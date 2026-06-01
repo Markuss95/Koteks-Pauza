@@ -8,7 +8,9 @@
       "mcp__Claude_Preview__preview_start",
       "PowerShell(foreach \\($port in 5173,3001\\) { try { Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction Stop | Select-Object -Expand OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force; \"killed PID $_ on $port\" } } catch { \"nothing on $port\" } })",
       "Bash(node --input-type=module -e ' *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173,3001 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalPort,OwningProcess | ForEach-Object { $p = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue; [PSCustomObject]@{Port=$_.LocalPort; PID=$_.OwningProcess; Name=$p.ProcessName} })",
+      "PowerShell(npm run build 2>&1)"
     ]
   }
 }

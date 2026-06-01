@@ -483,6 +483,11 @@ body {
 }
 .app--login {
   max-width: 420px;
+  /* Only a hero + a small card, so center it in the viewport instead of pinning
+     it to the top. dvh keeps it honest with mobile browser chrome. */
+  min-height: 100dvh;
+  justify-content: center;
+  padding-bottom: 32px;
 }
 .login {
   display: flex;

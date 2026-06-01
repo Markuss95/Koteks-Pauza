@@ -10,7 +10,16 @@
       "Bash(node --input-type=module -e ' *)",
       "Bash(npm uninstall *)",
       "PowerShell(Get-NetTCPConnection -LocalPort 5173,3001 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalPort,OwningProcess | ForEach-Object { $p = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue; [PSCustomObject]@{Port=$_.LocalPort; PID=$_.OwningProcess; Name=$p.ProcessName} })",
-      "PowerShell(npm run build 2>&1)"
+      "PowerShell(npm run build 2>&1)",
+      "Bash(python -c \"import yaml,sys; yaml.safe_load\\(open\\('.github/workflows/keep-warm.yml'\\)\\); print\\('YAML OK'\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('.github/workflows/keep-warm.yml','utf8'\\);if\\(!/cron:/.test\\(s\\)\\)process.exit\\(1\\);console.log\\('basic check OK \\(no yaml lib\\)'\\)\")",
+      "Bash(git check-ignore *)",
+      "Bash(git fetch *)",
+      "Bash(git rev-list *)",
+      "Bash(git add *)",
+      "Bash(git commit -m '@ *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

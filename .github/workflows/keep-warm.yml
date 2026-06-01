@@ -28,9 +28,9 @@ jobs:
     steps:
       - name: Ping health endpoint
         # --max-time 90 tolerates a cold start on the day's first ping (the ping
-        # that actually does the waking). Retry a couple of times for transient
-        # hiccups; don't fail the workflow if a single ping doesn't land.
+        # that actually does the waking). --retry covers transient hiccups. -f makes
+        # curl exit non-zero on a non-2xx response, so a wrong URL or a down backend
+        # surfaces as a RED run instead of a misleading green one.
         run: |
           curl -fsS --max-time 90 --retry 3 --retry-delay 10 \
-            https://koteks-pauza-api.onrender.com/api/health \
-            || echo "Ping failed this run — will try again on the next schedule."
+            https://koteks-pauza.onrender.com/api/health

@@ -277,6 +277,11 @@ function AttendanceCard({ data }) {
   const stats = useMemo(() => attendanceStats(state), [state])
   const totalDays = state.history.length
   const [selectedId, setSelectedId] = useState(null)
+  // From/to range (JS Dates) applied to the open user's trend chart. Kept at the
+  // card level so it persists when switching between people (easy comparison).
+  const [range, setRange] = useState({ from: null, to: null })
+  const fromKey = range.from ? dateKeyOf(range.from) : null
+  const toKey = range.to ? dateKeyOf(range.to) : null
 
   return (
     <section className="card">
@@ -312,7 +317,12 @@ function AttendanceCard({ data }) {
                   <span className="attendance__paid">💸 {s.paid}</span>
                 </button>
                 {open && (
-                  <AttendanceChart series={attendanceSeries(state, s.id)} name={s.displayName} />
+                  <AttendanceChart
+                    series={attendanceSeries(state, s.id, { from: fromKey, to: toKey })}
+                    name={s.displayName}
+                    range={range}
+                    onRangeChange={setRange}
+                  />
                 )}
               </li>
             )
@@ -329,11 +339,13 @@ const shortDay = (key) => {
   return `${Number(d)}.${Number(m)}.`
 }
 
+// Local calendar day of a JS Date as a YYYY-MM-DD key (matches coffee-day keys).
+const dateKeyOf = (d) => d.toLocaleDateString('en-CA')
+
 // Hand-rolled SVG line chart (no chart lib) showing a user's running attendance
 // rate across coffee days, with a dot per day (present/absent) and a ring on
 // days they paid. Scales to the card width via viewBox.
-function AttendanceChart({ series, name }) {
-  if (series.length === 0) return null
+function AttendanceChart({ series, name, range, onRangeChange }) {
   const W = 600
   const H = 180
   const PL = 34 // room for the % axis labels
@@ -354,14 +366,56 @@ function AttendanceChart({ series, name }) {
     series.map((p, i) => `L${xAt(i)},${yAt(p.rate)}`).join(' ') +
     ` L${xAt(n - 1)},${baseY} Z`
 
-  const lastRate = series[series.length - 1].rate
+  const ranged = !!(range.from || range.to)
+  const lastRate = n ? series[n - 1].rate : 0
 
   return (
     <div className="attendance-chart">
       <div className="attendance-chart__head">
         <span className="attendance-chart__title">{name} — dolasci kroz vrijeme</span>
-        <span className="muted">trenutno {Math.round(lastRate * 100)}%</span>
+        {n > 0 && (
+          <span className="muted">
+            {ranged ? 'u razdoblju' : 'trenutno'} {Math.round(lastRate * 100)}%
+          </span>
+        )}
       </div>
+
+      <div className="attendance-chart__controls">
+        <DatePicker
+          selected={range.from}
+          onChange={(d) => onRangeChange((r) => ({ ...r, from: d }))}
+          selectsStart
+          startDate={range.from}
+          endDate={range.to}
+          maxDate={range.to || undefined}
+          locale="hr"
+          dateFormat="d. M. yyyy."
+          placeholderText="Od"
+          isClearable
+          calendarStartDay={1}
+          customInput={<ActivityDateInput />}
+        />
+        <span className="attendance-chart__controls-sep">–</span>
+        <DatePicker
+          selected={range.to}
+          onChange={(d) => onRangeChange((r) => ({ ...r, to: d }))}
+          selectsEnd
+          startDate={range.from}
+          endDate={range.to}
+          minDate={range.from || undefined}
+          locale="hr"
+          dateFormat="d. M. yyyy."
+          placeholderText="Do"
+          isClearable
+          calendarStartDay={1}
+          customInput={<ActivityDateInput />}
+        />
+      </div>
+
+      {n === 0 ? (
+        <p className="muted attendance-chart__empty">Nema dolazaka u odabranom razdoblju.</p>
+      ) : (
+        <>
       <svg
         className="attendance-chart__svg"
         viewBox={`0 0 ${W} ${H}`}
@@ -423,6 +477,8 @@ function AttendanceChart({ series, name }) {
         <span className="attendance-chart__key attendance-chart__key--out">izostao</span>
         <span className="attendance-chart__key attendance-chart__key--paid">platio</span>
       </div>
+        </>
+      )}
     </div>
   )
 }

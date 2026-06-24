@@ -344,6 +344,18 @@ body {
   gap: 10px;
   margin-bottom: 8px;
 }
+.attendance-chart__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.attendance-chart__controls-sep {
+  color: var(--muted);
+}
+.attendance-chart__empty {
+  margin: 8px 0;
+}
 .attendance-chart__title {
   font-weight: 600;
   font-size: 0.9rem;

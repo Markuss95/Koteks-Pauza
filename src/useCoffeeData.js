@@ -195,3 +195,22 @@ export function attendanceStats(state) {
         a.displayName.localeCompare(b.displayName),
     )
 }
+
+// One point per coffee day (chronological), tracking how a single user's
+// attendance evolves: whether they were present that day, whether they paid,
+// and their running attendance rate up to and including that day. Drives the
+// per-user trend chart. Returns [] if there are no coffee days yet.
+export function attendanceSeries(state, userId) {
+  const days = [...state.history].sort((a, b) => a.date.localeCompare(b.date))
+  let attended = 0
+  return days.map((h, i) => {
+    const present = h.participantIds.includes(userId)
+    if (present) attended++
+    return {
+      date: h.date,
+      present,
+      paid: h.payerId === userId,
+      rate: attended / (i + 1),
+    }
+  })
+}

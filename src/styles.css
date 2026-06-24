@@ -309,6 +309,113 @@ body {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.attendance__item {
+  list-style: none;
+}
+.attendance__row {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.attendance__row:hover,
+.attendance__row--open {
+  background: var(--card2);
+}
+
+/* ---- Attendance trend chart ---------------------------------------------- */
+.attendance-chart {
+  margin: 8px 0 4px;
+  padding: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.attendance-chart__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.attendance-chart__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.attendance-chart__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.attendance-chart__grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.attendance-chart__label {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.attendance-chart__area {
+  fill: var(--accent);
+  opacity: 0.14;
+}
+.attendance-chart__line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.attendance-chart__dot {
+  stroke: var(--bg2);
+  stroke-width: 1.5;
+}
+.attendance-chart__dot--in {
+  fill: var(--green);
+}
+.attendance-chart__dot--out {
+  fill: var(--danger);
+}
+.attendance-chart__dot--paid {
+  stroke: var(--accent-strong);
+  stroke-width: 2.5;
+}
+.attendance-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.attendance-chart__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.attendance-chart__key::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.attendance-chart__key--in::before {
+  background: var(--green);
+}
+.attendance-chart__key--out::before {
+  background: var(--danger);
+}
+.attendance-chart__key--paid::before {
+  background: transparent;
+  border: 2px solid var(--accent-strong);
+}
 
 /* ---- People / forms ------------------------------------------------------ */
 .add-row {

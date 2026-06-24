@@ -10,6 +10,7 @@ import {
   payerAmong,
   isRecorded,
   attendanceStats,
+  attendanceSeries,
 } from './useCoffeeData.js'
 import {
   cetNow,
@@ -275,6 +276,7 @@ function AttendanceCard({ data }) {
   const { state } = data
   const stats = useMemo(() => attendanceStats(state), [state])
   const totalDays = state.history.length
+  const [selectedId, setSelectedId] = useState(null)
 
   return (
     <section className="card">
@@ -287,23 +289,141 @@ function AttendanceCard({ data }) {
         <p className="muted">Još nema zabilježenih dana s kavom.</p>
       ) : (
         <ul className="board">
-          {stats.map((s) => (
-            <li key={s.id} className="board__row board__row--attendance">
-              <span className="board__name">{s.displayName}</span>
-              <span className="board__bar">
-                <span className="board__fill" style={{ width: `${s.rate * 100}%` }} />
-              </span>
-              <span className="attendance__count" title="Dolasci / dana s kavom">
-                {s.attended}/{totalDays}
-              </span>
-              <span className="attendance__paid" title="Koliko je puta platio">
-                💸 {s.paid}
-              </span>
-            </li>
-          ))}
+          {stats.map((s) => {
+            const open = selectedId === s.id
+            return (
+              <li key={s.id} className="attendance__item">
+                <button
+                  type="button"
+                  className={`board__row board__row--attendance attendance__row ${
+                    open ? 'attendance__row--open' : ''
+                  }`}
+                  onClick={() => setSelectedId(open ? null : s.id)}
+                  aria-expanded={open}
+                  title="Klik za prikaz kretanja kroz vrijeme"
+                >
+                  <span className="board__name">{s.displayName}</span>
+                  <span className="board__bar">
+                    <span className="board__fill" style={{ width: `${s.rate * 100}%` }} />
+                  </span>
+                  <span className="attendance__count">
+                    {s.attended}/{totalDays}
+                  </span>
+                  <span className="attendance__paid">💸 {s.paid}</span>
+                </button>
+                {open && (
+                  <AttendanceChart series={attendanceSeries(state, s.id)} name={s.displayName} />
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>
+  )
+}
+
+// Short "d.m." label from a YYYY-MM-DD date key (for the chart's x-axis ends).
+const shortDay = (key) => {
+  const [, m, d] = key.split('-')
+  return `${Number(d)}.${Number(m)}.`
+}
+
+// Hand-rolled SVG line chart (no chart lib) showing a user's running attendance
+// rate across coffee days, with a dot per day (present/absent) and a ring on
+// days they paid. Scales to the card width via viewBox.
+function AttendanceChart({ series, name }) {
+  if (series.length === 0) return null
+  const W = 600
+  const H = 180
+  const PL = 34 // room for the % axis labels
+  const PR = 12
+  const PT = 12
+  const PB = 26 // room for the date labels
+  const plotW = W - PL - PR
+  const plotH = H - PT - PB
+  const n = series.length
+  const baseY = PT + plotH
+
+  const xAt = (i) => (n === 1 ? PL + plotW / 2 : PL + (i / (n - 1)) * plotW)
+  const yAt = (rate) => PT + (1 - rate) * plotH
+
+  const linePath = series.map((p, i) => `${i === 0 ? 'M' : 'L'}${xAt(i)},${yAt(p.rate)}`).join(' ')
+  const areaPath =
+    `M${xAt(0)},${baseY} ` +
+    series.map((p, i) => `L${xAt(i)},${yAt(p.rate)}`).join(' ') +
+    ` L${xAt(n - 1)},${baseY} Z`
+
+  const lastRate = series[series.length - 1].rate
+
+  return (
+    <div className="attendance-chart">
+      <div className="attendance-chart__head">
+        <span className="attendance-chart__title">{name} — dolasci kroz vrijeme</span>
+        <span className="muted">trenutno {Math.round(lastRate * 100)}%</span>
+      </div>
+      <svg
+        className="attendance-chart__svg"
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label={`Kretanje stope dolazaka za ${name}`}
+      >
+        {[1, 0.5, 0].map((g) => (
+          <g key={g}>
+            <line
+              className="attendance-chart__grid"
+              x1={PL}
+              x2={W - PR}
+              y1={yAt(g)}
+              y2={yAt(g)}
+            />
+            <text className="attendance-chart__label" x={PL - 6} y={yAt(g) + 4} textAnchor="end">
+              {g * 100}%
+            </text>
+          </g>
+        ))}
+
+        <path className="attendance-chart__area" d={areaPath} />
+        <path className="attendance-chart__line" d={linePath} />
+
+        {series.map((p, i) => (
+          <circle
+            key={p.date}
+            className={`attendance-chart__dot attendance-chart__dot--${p.present ? 'in' : 'out'} ${
+              p.paid ? 'attendance-chart__dot--paid' : ''
+            }`}
+            cx={xAt(i)}
+            cy={yAt(p.rate)}
+            r={p.paid ? 5 : 3.5}
+          >
+            <title>
+              {prettyDate(p.date)} — {p.present ? 'došao' : 'izostao'}
+              {p.paid ? ' (platio)' : ''} · {Math.round(p.rate * 100)}%
+            </title>
+          </circle>
+        ))}
+
+        <text className="attendance-chart__label" x={xAt(0)} y={H - 8} textAnchor="start">
+          {shortDay(series[0].date)}
+        </text>
+        {n > 1 && (
+          <text
+            className="attendance-chart__label"
+            x={xAt(n - 1)}
+            y={H - 8}
+            textAnchor="end"
+          >
+            {shortDay(series[n - 1].date)}
+          </text>
+        )}
+      </svg>
+
+      <div className="attendance-chart__legend">
+        <span className="attendance-chart__key attendance-chart__key--in">došao</span>
+        <span className="attendance-chart__key attendance-chart__key--out">izostao</span>
+        <span className="attendance-chart__key attendance-chart__key--paid">platio</span>
+      </div>
+    </div>
   )
 }
 

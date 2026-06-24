@@ -19,7 +19,12 @@
       "Bash(git add *)",
       "Bash(git commit -m '@ *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(gh run *)",
+      "Bash(gh workflow *)",
+      "PowerShell($now = Get-Date; \"Local time:  $\\($now.ToString\\('yyyy-MM-dd HH:mm'\\)\\) $\\(\\(Get-TimeZone\\).Id\\)\"; \"UTC time:    $\\($now.ToUniversalTime\\(\\).ToString\\('yyyy-MM-dd HH:mm'\\)\\) UTC\")",
+      "Bash(curl -s -o /dev/null -w \"wrong URL  \\(koteks-pauza-api\\): HTTP %{http_code}\\\\n\" --max-time 60 https://koteks-pauza-api.onrender.com/api/health)",
+      "Bash(curl -s -o /dev/null -w \"right URL  \\(koteks-pauza\\):     HTTP %{http_code}\\\\n\" --max-time 60 https://koteks-pauza.onrender.com/api/health)"
     ]
   }
 }

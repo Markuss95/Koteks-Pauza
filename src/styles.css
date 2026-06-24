@@ -294,6 +294,22 @@ body {
   font-weight: 700;
 }
 
+/* ---- Attendance ---------------------------------------------------------- */
+.board__row--attendance {
+  grid-template-columns: 1fr 2fr auto auto;
+}
+.attendance__count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.attendance__paid {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* ---- People / forms ------------------------------------------------------ */
 .add-row {
   display: flex;

@@ -165,3 +165,33 @@ export function payerAmong(participants, history = []) {
 export function isRecorded(state, dateKey) {
   return state.history.some((h) => h.date === dateKey)
 }
+
+// Attendance is only ever recorded on a day someone paid the bill — that's the
+// only time we snapshot who was present (a payment's participantIds). So the set
+// of "coffee days" is exactly state.history, and a user attended a day iff their
+// id is in that day's participants. Counts are computed purely from history, so
+// no backend changes are needed.
+export function attendanceStats(state) {
+  const totalDays = state.history.length
+  return state.users
+    .map((u) => {
+      const attended = state.history.reduce(
+        (n, h) => n + (h.participantIds.includes(u.id) ? 1 : 0),
+        0,
+      )
+      const paid = state.history.reduce((n, h) => n + (h.payerId === u.id ? 1 : 0), 0)
+      return {
+        id: u.id,
+        displayName: u.displayName,
+        attended,
+        paid,
+        rate: totalDays ? attended / totalDays : 0,
+      }
+    })
+    .sort(
+      (a, b) =>
+        b.attended - a.attended ||
+        b.paid - a.paid ||
+        a.displayName.localeCompare(b.displayName),
+    )
+}

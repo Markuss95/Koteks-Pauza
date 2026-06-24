@@ -9,6 +9,7 @@ import {
   participantsFor,
   payerAmong,
   isRecorded,
+  attendanceStats,
 } from './useCoffeeData.js'
 import {
   cetNow,
@@ -78,6 +79,7 @@ function Main() {
       <Scoreboard users={data.state.users} />
       <HistoryCard data={data} />
       <ActivityCard data={data} />
+      {isAdmin && <AttendanceCard data={data} />}
       {isAdmin && <MembersCard data={data} currentUserId={user.id} />}
 
       <footer className="footer">
@@ -265,6 +267,42 @@ function Scoreboard({ users }) {
           </li>
         ))}
       </ul>
+    </section>
+  )
+}
+
+function AttendanceCard({ data }) {
+  const { state } = data
+  const stats = useMemo(() => attendanceStats(state), [state])
+  const totalDays = state.history.length
+
+  return (
+    <section className="card">
+      <div className="card__head">
+        <h2>Dolasci</h2>
+        <span className="muted">{totalDays} dana s kavom</span>
+      </div>
+
+      {totalDays === 0 ? (
+        <p className="muted">Još nema zabilježenih dana s kavom.</p>
+      ) : (
+        <ul className="board">
+          {stats.map((s) => (
+            <li key={s.id} className="board__row board__row--attendance">
+              <span className="board__name">{s.displayName}</span>
+              <span className="board__bar">
+                <span className="board__fill" style={{ width: `${s.rate * 100}%` }} />
+              </span>
+              <span className="attendance__count" title="Dolasci / dana s kavom">
+                {s.attended}/{totalDays}
+              </span>
+              <span className="attendance__paid" title="Koliko je puta platio">
+                💸 {s.paid}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

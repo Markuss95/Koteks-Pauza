@@ -27,6 +27,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// Flipped to true once the DB connection + schema setup succeeds (see boot at
+// the bottom of the file). Read by /api/health and the readiness gate.
+let dbReady = false
+
 const publicUser = (u) =>
   u && {
     id: u.id,
@@ -60,8 +64,23 @@ function requireAdmin(req, res, next) {
 }
 
 // ---- Health (for the hosting platform's health check) ----------------------
+// Always 200, even before the DB is ready, so the host keeps the instance alive
+// and warm while init() retries in the background (see bottom of file). If this
+// reflected DB state, a slow Turso connection would make the host kill/restart
+// the instance — turning a transient blip into a crash loop.
+app.get('/api/health', (req, res) => res.json({ ok: true, db: dbReady }))
 
-app.get('/api/health', (req, res) => res.json({ ok: true }))
+// Until the DB connects, data routes can't work — return a clean 503 (with a
+// Croatian message) instead of hanging or 500ing. Health is already handled
+// above; everything below this line requires the DB.
+app.use((req, res, next) => {
+  if (!dbReady) {
+    return res
+      .status(503)
+      .json({ error: 'Poslužitelj se pokreće, pokušajte ponovno za koji trenutak.' })
+  }
+  next()
+})
 
 // ---- Auth ------------------------------------------------------------------
 
@@ -282,5 +301,26 @@ app.use((err, req, res, next) => {
 // In production, hosts like Render/Railway provide the port via PORT.
 const PORT = process.env.API_PORT || process.env.PORT || 3001
 
-await init()
+// Listen FIRST, initialize the DB in the background. This way /api/health
+// responds immediately so the host marks the instance healthy and keeps it
+// warm, and a slow or briefly-unreachable Turso can't hang the whole boot the
+// way `await init()` before listen() used to (that made one bad wake take the
+// entire service down with 504s). Until init() succeeds, data routes return 503.
 app.listen(PORT, () => console.log(`Koteks Pauza API on port ${PORT}`))
+
+async function initWithRetry() {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await init()
+      dbReady = true
+      console.log('Database ready — accepting requests.')
+      return
+    } catch (err) {
+      const delay = Math.min(30000, attempt * 5000)
+      console.error(`DB init failed (attempt ${attempt}), retrying in ${delay / 1000}s:`, err.message)
+      await new Promise((resolve) => setTimeout(resolve, delay))
+    }
+  }
+}
+
+initWithRetry()

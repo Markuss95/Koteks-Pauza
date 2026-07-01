@@ -24,7 +24,15 @@
       "Bash(gh workflow *)",
       "PowerShell($now = Get-Date; \"Local time:  $\\($now.ToString\\('yyyy-MM-dd HH:mm'\\)\\) $\\(\\(Get-TimeZone\\).Id\\)\"; \"UTC time:    $\\($now.ToUniversalTime\\(\\).ToString\\('yyyy-MM-dd HH:mm'\\)\\) UTC\")",
       "Bash(curl -s -o /dev/null -w \"wrong URL  \\(koteks-pauza-api\\): HTTP %{http_code}\\\\n\" --max-time 60 https://koteks-pauza-api.onrender.com/api/health)",
-      "Bash(curl -s -o /dev/null -w \"right URL  \\(koteks-pauza\\):     HTTP %{http_code}\\\\n\" --max-time 60 https://koteks-pauza.onrender.com/api/health)"
+      "Bash(curl -s -o /dev/null -w \"right URL  \\(koteks-pauza\\):     HTTP %{http_code}\\\\n\" --max-time 60 https://koteks-pauza.onrender.com/api/health)",
+      "Bash(curl -s -o /dev/null -w \"http_code=%{http_code} time_total=%{time_total}s\\\\n\" --max-time 120 https://koteks-pauza.onrender.com/api/health)",
+      "Bash(curl -s -o /dev/null -w \"http_code=%{http_code} time_total=%{time_total}s\\\\n\" --max-time 120 -X POST -H \"Content-Type: application/json\" -d '{\"username\":\"x\",\"password\":\"y\"}' https://koteks-pauza.onrender.com/api/auth/login)",
+      "Bash(curl -s -o /dev/null -w \"http_code=%{http_code} time_total=%{time_total}s\\\\n\" --max-time 70 https://koteks-pauza.onrender.com/api/health)",
+      "Bash(API_PORT=3999 node server/index.js)",
+      "Bash(echo \"started pid $!\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -m 5 -w \"\\\\nhttp_code=%{http_code}\\\\n\" http://localhost:3999/api/health)",
+      "Bash(curl -s -m 5 -w \"\\\\nhttp_code=%{http_code}\\\\n\" -X POST -H \"Content-Type: application/json\" -d '{\"username\":\"x\",\"password\":\"y\"}' http://localhost:3999/api/auth/login)"
     ]
   }
 }
